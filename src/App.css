@@ -1,0 +1,142 @@
+
+body {
+background: linear-gradient(135deg, #181818 0%, #23272f 100%);
+color: #eaeaea;
+font-family: 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+margin: 0;
+min-height: 100vh;
+padding-left: 32px;
+padding-right: 32px;
+padding-top: 16px;
+}
+
+.App {
+  text-align: center;
+  background: transparent;
+}
+
+.header-text {
+  color: #eaeaea;
+  font-family: 'Inter', 'Segoe UI', Arial, Helvetica, sans-serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.content-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.main-content {
+  background: #23272f;
+  color: #eaeaea;
+  padding: 40px 32px;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  width: 90%;
+  max-width: 1200px;
+  position: relative;
+  opacity: 0.97;
+}
+
+.sub-heading {
+  font-size: 1.2rem;
+  color: #bdbdbd;
+  font-weight: 400;
+}
+
+.lesson-card {
+  background: #23272f;
+  border-radius: 10px;
+  border: 1px solid #353a45;
+  padding: 18px 16px;
+  margin: 18px;
+  width: 320px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  transition: background 0.2s, border-color 0.2s;
+  cursor: pointer;
+  color: #eaeaea;
+}
+
+.lesson-card:hover {
+  background: #181a20;
+  border-color: #4e5462;
+}
+
+.more-info-panel {
+  background: #181818;
+  color: #eaeaea;
+  padding: 10px 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+
+.black-text {
+  color: #eaeaea;
+}
+
+.hero-stats-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  min-height: 80px;
+  border-bottom: 1px solid #353a45;
+  background: #23272f;
+  color: #eaeaea;
+  font-size: 1em;
+}
+
+.hero-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 2px solid #353a45;
+}
+
+.stat-item {
+  flex: 2;
+  text-align: center;
+  padding: 0 8px;
+  color: #eaeaea;
+  font-size: 1.05em;
+}
+
+.hero-stats-header {
+  background: #181818;
+  color: #bdbdbd;
+  font-weight: 600;
+  font-size: 1.1em;
+  border-bottom: 2px solid #353a45;
+  padding: 8px 0;
+}
+
+.filters-bar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+  align-items: center;
+}
+
+.filters-bar input {
+  background: #23272f;
+  color: #eaeaea;
+  border: 1px solid #353a45;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1em;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.filters-bar input:focus {
+  border-color: #4e5462;
+}
