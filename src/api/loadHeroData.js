@@ -6,33 +6,42 @@ async function loadHeroData() {
     // Fetch all heroes and abilities from public API
     const heroesRes = await axios.get('https://assets.deadlock-api.com/v2/heroes');
     const abilitiesRes = await axios.get('https://assets.deadlock-api.com/v2/items');
-    const heroesData = heroesRes.data;
-    const abilitiesData = abilitiesRes.data;
-    for (const hero of Object.values(heroesData)) {
-      if (hero.disabled === true) continue;
-      // Get up to 4 abilities for this hero
-      let heroAbilities = [];
-      if (Array.isArray(abilitiesData)) {
-        heroAbilities = abilitiesData.filter(item => item.hero === hero.id && item.type === 'ability' && item.ability_type === 'signature');
-      }
-      // Map ability descriptions and images
-      const abilityDescs = [heroAbilities[0]?.description.quip, heroAbilities[1]?.description.quip, heroAbilities[2]?.description.quip, heroAbilities[3]?.description.quip];
-      const abilityImgs = [heroAbilities[0]?.image , heroAbilities[1]?.image,  heroAbilities[2]?.image, heroAbilities[3]?.image];
-      // Insert each hero into local DB
+    const heroesData = Object.values(heroesRes.data);
+    const abilitiesData = Object.values(abilitiesRes.data);
+    console.log(`Fetched ${Object.keys(heroesData).length} heroes and ${abilitiesData.length} abilities from API.`);
+    for (const hero of heroesData) {
+      if (hero.disabled === true || hero.in_development === true) continue;
+      console.log(`Processing hero: ${hero.name}`);
+      heroAbilities = abilitiesData.filter(item => item.hero === hero.id && item.type === 'ability' && item.ability_type === 'signature');
+      heroUltimate = abilitiesData.filter(item => item.hero === hero.id && item.type === 'ability' && item.ability_type === 'ultimate');
+      let heroWeapon = abilitiesData.find(item => item.hero === hero.id && item.type === 'weapon');
+     
       await db.addHero(
         hero.id,
         hero.name,
-        hero.description.lore|| '',
-        hero.description.playstyle || '',
-        abilityDescs[0],
-        abilityDescs[1],
-        abilityDescs[2],
-        abilityDescs[3],
-        hero.images?.icon_hero_card || '',
-        abilityImgs[0],
-        abilityImgs[1],
-        abilityImgs[2],
-        abilityImgs[3]
+        hero.description.lore, 
+        hero.description.role,
+        heroAbilities[0].name,
+        heroAbilities[1].name,
+        heroAbilities[2].name,
+        heroUltimate[0].name,
+        hero.images.icon_hero_card,
+        heroAbilities[0].image,
+        heroAbilities[1].image,
+        heroAbilities[2].image,
+        heroUltimate[0].image,
+        heroAbilities[0].description.quip,
+        heroAbilities[1].description.quip,
+        heroAbilities[2].description.quip,
+        heroUltimate[0].description.quip,
+        null, // Placeholder for hero weapon name
+        hero.shop_stat_display.weapon_stats_display.weapon_image,
+        hero.description.playstyle,
+        heroAbilities[0].id,
+        heroAbilities[1].id,
+        heroAbilities[2].id,
+        heroUltimate[0].id,
+        heroWeapon.id
       );
       console.log(`Inserted hero: ${hero.name}`);
     }

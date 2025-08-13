@@ -69,10 +69,31 @@ dataPool.getHeroes = () => {
   });
 }
 
-dataPool.addHero = (hero_id, hero_name, hero_description, hero_role, ability1_desc, ability2_desc, ability3_desc, ability4_desc, hero_image, ability1_img, ability2_img, ability3_img, ability4_img) => {
+dataPool.addHero = (
+  hero_idPrimary, name, description, role,
+  ability1Name, ability2Name, ability3Name, ability4Name,
+  image_url, ability1_img, ability2_img, ability3_img, ability4_img,
+  ability1Quip, ability2Quip, ability3Quip, ability4Quip,
+  weaponName, weaponImage, playstyle,
+  abiltity1Id, abiltity2Id, abiltity3Id, abiltity4Id, weaponId
+) => {
   return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO Hero (hero_id, hero_name, hero_description, hero_role, ability1_desc, ability2_desc, ability3_desc, ability4_desc, hero_image, ability1_img, ability2_img, ability3_img, ability4_img) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [hero_id, hero_name, hero_description, hero_role, ability1_desc, ability2_desc, ability3_desc, ability4_desc, hero_image, ability1_img, ability2_img, ability3_img, ability4_img], (err, result) => {
+    const sql = `INSERT INTO Hero (
+      hero_id, name, description, role,
+      ability1Name, ability2Name, ability3Name, ability4Name,
+      image_url, ability1_img, ability2_img, ability3_img, ability4_img,
+      ability1Quip, ability2Quip, ability3Quip, ability4Quip,
+      weaponName, weaponImage, playstyle,
+      abiltity1Id, abiltity2Id, abiltity3Id, abiltity4Id, weaponId
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    conn.query(sql, [
+      hero_idPrimary, name, description, role,
+      ability1Name, ability2Name, ability3Name, ability4Name,
+      image_url, ability1_img, ability2_img, ability3_img, ability4_img,
+      ability1Quip, ability2Quip, ability3Quip, ability4Quip,
+      weaponName, weaponImage, playstyle,
+      abiltity1Id, abiltity2Id, abiltity3Id, abiltity4Id, weaponId
+    ], (err, result) => {
       if (err) return reject(err);
       return resolve(result);
     });
