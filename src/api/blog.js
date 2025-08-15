@@ -4,7 +4,6 @@ const dataPool = require('../DB/DBconn');
 
 // Middleware to check if user is logged in
 function isAuthenticated(req, res, next) {
-    console.log(req.session.loggedin);
 	if (req.session && req.session.loggedin) {
 		return next();
 	} else {
@@ -39,5 +38,60 @@ router.get('/all', async (req, res) => {
 		return res.json({ success: false, error: 'Server error.' });
 	}
 });
+
+router.post('/vote', isAuthenticated, async (req, res) => {
+	const { postId, voteType } = req.body;
+	console.log("voteType: " + voteType);
+	console.log("postId: " + postId);	
+	console.log("session loggedin:" + req.session.loggedin);
+	if (!postId) {
+		return res.json({ success: false, error: 'Missing fields.' });
+	}
+	try {
+		const userId = req.session.username; // Assuming userId is stored in session
+		console.log("userId: " + userId);
+		await dataPool.votePost(postId, userId, voteType);
+		return res.json({ success: true });
+	} catch (err) {
+		console.error('Vote post error:', err);
+		return res.json({ success: false, error: 'Server error.' });
+	}
+});
+
+router.get('/vote/:id', async (req, res) => {
+	const postId = req.params.id;
+	if (!postId) {
+		return res.json({ success: false, error: 'Missing post ID.' });
+	}
+	try {
+		const votes = await dataPool.getPostVotes(postId);
+		return res.json({ success: true, votes });
+	}
+	catch (err) {
+		console.error('Get post votes error:', err);
+		return res.json({ success: false, error: 'Server error.' });
+	}		
+});
+router.get('/user-vote/:id', isAuthenticated, async (req, res) => {
+	const postId = req.params.id;	
+	if (!postId) {
+		return res.json({ success: false, error: 'Missing post ID.' });
+	}	
+	const userId = req.session.username; // Assuming userId is stored in session
+	try {
+		const userVote = await dataPool.getUserVote(postId, userId);			
+		if (userVote) {
+			return res.json({ success: true, userVote });
+		} else {
+			return res.json({ success: false, error: 'User has not voted on this post.' });
+		}
+	} catch (err) {
+		console.error('Get user vote error:', err);
+		return res.json({ success: false, error: 'Server error.' });
+	}
+});
+
+
+
 
 module.exports = router;

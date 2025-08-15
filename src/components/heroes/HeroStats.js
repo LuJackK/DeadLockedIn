@@ -1,9 +1,9 @@
 import React from 'react';
-import NavigatorHOC from '../shared/NavigatorHOC';
+import { useNavigate } from 'react-router';
 
 function HeroStats(props) {
-    const { name, imageUrl, winRate, pickRate, kda, totalMatches, navigate } = props;
-
+    const { id, name, imageUrl, winRate, pickRate, kda, totalMatches } = props;
+    const navigate = useNavigate();
 
     const barStyle = {
         display: 'flex',
@@ -34,9 +34,7 @@ function HeroStats(props) {
         padding: '0 8px',
     };
 
-
-   
-    const appEndpoint = name ? `/heroes/${name.replace(/\s+/g, '_').toLowerCase()}` : null;
+    const appEndpoint = name ? `/heroes/${id}` : null;
 
     const handleClick = () => {
         if (appEndpoint) {
@@ -58,4 +56,4 @@ function HeroStats(props) {
     );
 }
 
-export default NavigatorHOC(HeroStats);
+export default HeroStats;

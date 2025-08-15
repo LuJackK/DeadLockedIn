@@ -2,26 +2,25 @@ const express = require('express');
 const router = express.Router();
 const db = require('../DB/DBconn');
 
-// Get all heroes
+// Get all items
 router.get('/', async (req, res) => {
   try {
-    const heroes = await db.getHeroes();
-    res.json(heroes);
+    const items = await db.getItemAll();
+    res.json(items);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Get hero by ID
+// Get item by ID
 router.get('/:id', async (req, res) => {
   try {
-    const hero = await db.getHeroById(req.params.id);
-    if (!hero) return res.status(404).json({ error: 'Hero not found' });
-    res.json(hero);
+    const item = await db.getItemById(req.params.id);
+    if (!item) return res.status(404).json({ error: 'Item not found' });
+    res.json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 module.exports = router;

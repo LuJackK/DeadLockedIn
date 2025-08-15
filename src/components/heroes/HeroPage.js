@@ -13,15 +13,14 @@ function HeroPage() {
     const fetchHeroesAndStats = async () => {
         try {
             const [heroesRes, statsRes] = await Promise.all([
-                axios.get('https://assets.deadlock-api.com/v2/heroes'),
+                axios.get('http://88.200.63.148:5002/api/hero'),
                 axios.get('https://api.deadlock-api.com/v1/analytics/hero-stats')
             ]);
             const heroesData = heroesRes.data;
             const statsData = statsRes.data;
             const arr = Object.values(heroesData)
-                .filter(hero => (hero.disabled === false && hero.in_development === false))
                 .map(hero => {
-                    const stat = statsData.find(s => s.hero_id === hero.id);
+                    const stat = statsData.find(s => s.hero_id === hero.hero_id);
                     let winRate, pickRate, kda, totalMatches;
                     if (stat && stat.matches && stat.matches_per_bucket) {
                         winRate = ((stat.wins / stat.matches) * 100).toFixed(2);
@@ -32,9 +31,9 @@ function HeroPage() {
                         winRate = pickRate = kda = totalMatches = null;
                     }
                     return {
-                        id: hero.id,
+                        id: hero.hero_id,
                         name: hero.name,
-                        imageUrl: hero.images.icon_hero_card,
+                        imageUrl: hero.image_url,
                         winRate,
                         pickRate,
                         kda,
@@ -96,6 +95,7 @@ function HeroPage() {
                 {sortedHeroes.map(h => (
                     <HeroStats
                         key={h.id}
+                        id={h.id}
                         name={h.name}
                         imageUrl={h.imageUrl}
                         winRate={h.winRate}

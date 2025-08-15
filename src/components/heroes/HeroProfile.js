@@ -1,48 +1,50 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Post from '../community-blog/Post';
 import { useParams } from 'react-router';
+import TabNavigator from './TabNavigator';
+import HeroBlogPage from './HeroBlogPage';
 
 function HeroProfile() {
-	const { heroName } = useParams();
+	const { heroId } = useParams();
 	const [hero, setHero] = useState(null);
+	const [heroAbilities, setHeroAbilities] = useState([]);
 	const [stats, setStats] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const [abilities, setAbilities] = useState([]);
 	const [posts, setPosts] = useState([]);
 	const [activeTab, setActiveTab] = useState('about');
 
 	useEffect(() => {
 		fetchHeroData();
 		fetchPosts();
-	}, [heroName]);
+	}, [heroId]);
 
 	const fetchHeroData = async () => {
 		setLoading(true);
 		try {
-			const formattedName = heroName.replace(/_/g, ' ');
-			const [heroesRes, statsRes, assetsRes] = await Promise.all([
-				axios.get('https://assets.deadlock-api.com/v2/heroes'),
+			
+			const [heroesRes, statsRes] = await Promise.all([
+				axios.get(`http://88.200.63.148:5002/api/hero/${heroId}`),
 				axios.get('https://api.deadlock-api.com/v1/analytics/hero-stats'),
-				axios.get('https://assets.deadlock-api.com/v2/items')
 			]);
+			console.log('Hero response:', heroesRes);
 			const heroesData = heroesRes.data;
 			const statsData = statsRes.data;
-			const assetsData = assetsRes.data;
-			const heroObj = Object.values(heroesData).find(h => h.name.toLowerCase() === formattedName.toLowerCase());
-			const statObj = heroObj ? statsData.find(s => s.hero_id === heroObj.id) : null;
-			setHero(heroObj);
+			const statObj = statsData.find(s => s.hero_id === heroesData.hero_id);
+			setHero(heroesData);
 			setStats(statObj);
-			let heroAbilities = [];
-			if (heroObj && Array.isArray(assetsData)) {
-				heroAbilities = assetsData.filter(item => item.hero === heroObj.id && item.type === 'ability');
-			}
-			setAbilities(heroAbilities);
+			setHeroAbilities([
+			{img: heroesData.ability1_img, name: heroesData.ability1Name, quip: heroesData.ability1Quip}, 
+			{img: heroesData.ability2_img, name: heroesData.ability2Name, quip: heroesData.ability2Quip}, 
+			{img: heroesData.ability3_img, name: heroesData.ability3Name, quip: heroesData.ability3Quip}, 
+			{img: heroesData.ability4_img, name: heroesData.ability4Name, quip: heroesData.ability4Quip}
+			]);
+			console.log('Hero abilities:', heroAbilities);
+				
 		} catch (err) {
+			console.error('Error fetching hero data:', err);
 			setHero(null);
 			setStats(null);
-			setAbilities([]);
 		}
 		setLoading(false);
 	};
@@ -67,7 +69,6 @@ function HeroProfile() {
 			setPosts([]);
 		}
 	};
-
 
 	if (loading) return <div style={{ color: '#eaeaea', padding: '32px' }}>Loading...</div>;
 	if (!hero) return <div style={{ color: '#eaeaea', padding: '32px' }}>Hero not found.</div>;
@@ -110,12 +111,7 @@ function HeroProfile() {
 			<div style={{ background: '#23272f', color: '#eaeaea', borderRadius: '18px', boxShadow: '0 4px 24px rgba(0,0,0,0.4)', padding: '32px', maxWidth: '1100px', margin: '32px auto' }}>
 				<div style={{ display: 'flex', alignItems: 'flex-start', gap: '0' }}>
 					{/* Tab Switcher Container */}
-					<div style={tabSwitcherContainerStyle}>
-						<div style={tabListStyle}>
-							<button style={tabButtonStyle(activeTab === 'about')} onClick={() => setActiveTab('about')}>About</button>
-							<button style={tabButtonStyle(activeTab === 'blog')} onClick={() => setActiveTab('blog')}>Blog Posts</button>
-						</div>
-					</div>
+					<TabNavigator activeTab={activeTab} setActiveTab={setActiveTab} />
 					{/* Tab Content */}
 					<div style={{ flex: 1, width: '100%' }}>
 						{activeTab === 'about' && (
@@ -123,7 +119,7 @@ function HeroProfile() {
 								<div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '32px', gap: '32px' }}>
 									{/* Hero image and description container */}
 									<div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', background: '#23272f', borderRadius: '12px', padding: '18px', boxSizing: 'border-box', minWidth: '0' }}>
-										<img src={hero.images?.icon_hero_card} alt={hero.name} style={{ width: '120px', height: '120px', borderRadius: '18px', objectFit: 'cover', border: '2px solid #353a45', marginBottom: '18px' }} />
+										<img src={hero.image_url} alt={hero.name} style={{ width: '120px', height: '120px', borderRadius: '18px', objectFit: 'cover', border: '2px solid #353a45', marginBottom: '18px' }} />
 										<div style={{ width: '100%' }}>
 											<h2 style={{ margin: 0, fontSize: '2.2em', fontWeight: 700 }}>{hero.name}</h2>
 											{typeof hero.description === 'string' ? (
@@ -154,14 +150,14 @@ function HeroProfile() {
 									{/* Abilities container */}
 									<div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'flex-start', background: '#23272f', borderRadius: '12px', padding: '18px', boxSizing: 'border-box', minWidth: '0' }}>
 										<h3 style={{ color: '#eaeaea', fontWeight: 600, fontSize: '1.1em', marginBottom: '12px' }}>Abilities</h3>
-										{abilities.length > 1 ? abilities.slice(1).map(ability => (
+										{heroAbilities.length > 0 ? heroAbilities.map(ability => (
 											<div key={ability.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', width: '100%' }}>
 												<img
-													src={ability.image_webp || ability.image}
+													src={ability.img}
 													alt={ability.name}
 													style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #353a45', background: '#23272f' }}
 												/>
-												<div style={{ color: '#bdbdbd', fontSize: '1em', width: 'calc(100% - 76px)' }}>{ability.description.quip}</div>
+												<div style={{ color: '#bdbdbd', fontSize: '1em', width: 'calc(100% - 76px)' }}>{ability.quip}</div>
 											</div>
 										)) : <div style={{ color: '#bdbdbd', fontSize: '1em' }}>No abilities found.</div>}
 									</div>
@@ -182,18 +178,7 @@ function HeroProfile() {
 							</>
 						)}
 						{activeTab === 'blog' && (
-							<div style={{ marginTop: '0' }}>
-								<h3 style={{ fontWeight: 600, fontSize: '1.2em', marginBottom: '18px' }}>Related Blog Posts</h3>
-								{posts.length > 0 ? (
-									<div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-										{posts.map(post => (
-											<Post key={post.id || post._id} {...post} />
-										))}
-									</div>
-								) : (
-									<div style={{ color: '#bdbdbd', fontSize: '1.08em', marginTop: '24px' }}>No related blog posts found.</div>
-								)}
-							</div>
+							<HeroBlogPage posts={posts} />
 						)}
 					</div>
 				</div>

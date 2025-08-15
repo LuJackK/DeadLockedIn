@@ -13,16 +13,15 @@ function ItemPage() {
 	const fetchItemsAndStats = async () => {
 		try {
 			const [itemsRes, statsRes] = await Promise.all([
-				axios.get('https://assets.deadlock-api.com/v2/items'),
+				axios.get('http://88.200.63.148:5002/api/item'),
 				axios.get('https://api.deadlock-api.com/v1/analytics/item-stats?min_matches=1')
 			]);
 			const itemsData = itemsRes.data;
 			const statsData = statsRes.data;
 			const arr = Object.values(itemsData)
-				.filter(item => item.shop_image)
 				.map(item => {
                     console.log(item);
-					const stat = statsData.find(s => s.item_id === item.id);
+					const stat = statsData.find(s => s.item_id === item.item_id);
 					let winRate, totalMatches;
 					if (stat && stat.matches) {
 						winRate = ((stat.wins / stat.matches) * 100).toFixed(2);
@@ -31,9 +30,9 @@ function ItemPage() {
 						winRate = totalMatches = null;
 					}
 					return {
-						id: item.id,
+						id: item.item_id,
 						name: item.name,
-						imageUrl: item.shop_image,
+						imageUrl: item.img_url,
 						winRate,
 						totalMatches
 					};
