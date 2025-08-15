@@ -33,4 +33,42 @@ router.post('/create-account', async (req, res) => {
     }
 });
 
+
+
+
+// Get current logged-in user info
+router.get('/info', async (req, res) => {
+    if (!req.session || !req.session.loggedin || !req.session.username) {
+        return res.json({ success: false, error: 'Not logged in.' });
+    }
+    try {
+        const userArr = await dataPool.getUsersDetails(req.session.username);
+        if (userArr && userArr.length > 0) {
+            const user = userArr[0];
+            return res.json({ success: true, user });
+        } else {
+            return res.json({ success: false, error: 'User not found.' });
+        }
+    } catch (err) {
+        return res.json({ success: false, error: 'Server error.' });
+    }
+});
+router.post('/link-account', async (req, res) => {
+    const playerId = req.session.username;
+    const steamId = req.body.steamId;
+    if (!playerId || !steamId) {
+        return res.json({ success: false, error: 'Missing fields.' });
+    }
+    try {
+        const result = await dataPool.linkSteamAccount(playerId, steamId);
+        if (result.affectedRows > 0) {
+            return res.json({ success: true });
+        }
+        return res.json({ success: false, error: 'Failed to link account.' });
+    } catch (err) {
+        console.error('Error linking account:', err);
+        return res.json({ success: false, error: 'Server error.' });
+    }
+});
+
 module.exports = router;

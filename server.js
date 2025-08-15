@@ -14,8 +14,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // Set to true if using HTTPS
-    sameSite: 'lax' // Allow cross-origin cookies
+    secure: false, 
+    sameSite: 'lax' 
   }
 }));
 app.use('/api', accountRouter);

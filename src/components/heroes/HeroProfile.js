@@ -16,8 +16,13 @@ function HeroProfile() {
 
 	useEffect(() => {
 		fetchHeroData();
-		fetchPosts();
 	}, [heroId]);
+
+	useEffect(() => {
+		if (hero && hero.name) {
+			fetchPosts();
+		}
+	}, [hero]);
 
 	const fetchHeroData = async () => {
 		setLoading(true);
@@ -53,8 +58,9 @@ function HeroProfile() {
 	const fetchPosts = async () => {
 		try {
 			const res = await axios.get('http://88.200.63.148:5002/api/blog/all');
-			const formattedName = heroName.replace(/_/g, ' ').toLowerCase().trim();
+			const formattedName = hero.name.replace(/_/g, ' ').toLowerCase().trim();
 			const posts = Array.isArray(res.data.posts) ? res.data.posts : [];
+			console.log('Fetched posts:', posts);
 			const filtered = posts.filter(post => {
 				if (typeof post.tags === 'string') {
 					return post.tags
@@ -64,6 +70,7 @@ function HeroProfile() {
 				}
 				return false;
 			});
+			console.log('Filtered posts:', filtered);
 			setPosts(filtered);
 		} catch (err) {
 			setPosts([]);

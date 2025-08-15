@@ -6,7 +6,9 @@ import { Outlet } from 'react-router';
 
 
 class App extends React.Component {
-
+  componentDidMount() {
+    document.title = "DeadLockedIn"; 
+  }
   render() {
     return (
       <TabContainer >

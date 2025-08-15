@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const dataPool = require('../DB/DBconn');
 
-// Middleware to check if user is logged in
 function isAuthenticated(req, res, next) {
 	if (req.session && req.session.loggedin) {
 		return next();
@@ -11,7 +10,6 @@ function isAuthenticated(req, res, next) {
 	}
 }
 
-// Create blog post endpoint (protected)
 router.post('/create', isAuthenticated, async (req, res) => {
 	const { title, content, tags, image_url } = req.body;
 	const author = req.session.username;
@@ -41,14 +39,11 @@ router.get('/all', async (req, res) => {
 
 router.post('/vote', isAuthenticated, async (req, res) => {
 	const { postId, voteType } = req.body;
-	console.log("voteType: " + voteType);
-	console.log("postId: " + postId);	
-	console.log("session loggedin:" + req.session.loggedin);
 	if (!postId) {
 		return res.json({ success: false, error: 'Missing fields.' });
 	}
 	try {
-		const userId = req.session.username; // Assuming userId is stored in session
+		const userId = req.session.username; 
 		console.log("userId: " + userId);
 		await dataPool.votePost(postId, userId, voteType);
 		return res.json({ success: true });
@@ -68,30 +63,89 @@ router.get('/vote/:id', async (req, res) => {
 		return res.json({ success: true, votes });
 	}
 	catch (err) {
-		console.error('Get post votes error:', err);
 		return res.json({ success: false, error: 'Server error.' });
 	}		
 });
+
 router.get('/user-vote/:id', isAuthenticated, async (req, res) => {
 	const postId = req.params.id;	
 	if (!postId) {
 		return res.json({ success: false, error: 'Missing post ID.' });
 	}	
-	const userId = req.session.username; // Assuming userId is stored in session
+	const userId = req.session.username;
 	try {
-		const userVote = await dataPool.getUserVote(postId, userId);			
+		const userVote = await dataPool.getUserVotes(postId, userId);			
 		if (userVote) {
 			return res.json({ success: true, userVote });
 		} else {
 			return res.json({ success: false, error: 'User has not voted on this post.' });
 		}
 	} catch (err) {
-		console.error('Get user vote error:', err);
 		return res.json({ success: false, error: 'Server error.' });
 	}
 });
 
+router.post('/comment', isAuthenticated, async (req, res) => {
+	const { postId, content } = req.body;
+	const author = req.session.username;
+	if (!postId || !content || !author) {
+		return res.json({ success: false, error: 'Missing fields or not logged in.' });
+	}
+	try {
+		const createdOn = new Date();
+		await dataPool.addComment(postId, author, content, createdOn);
+		return res.json({ success: true });
+	} catch (err) {
+		console.error('Add comment error:', err);
+		return res.json({ success: false, error: 'Server error.' });
+	}
+});
+router.get('/comment/:postId', async (req, res) => {
+	const postId = req.params.postId;
+	if (!postId) {
+		return res.json({ success: false, error: 'Missing post ID.' });
+	}
+	try {
+		const comments = await dataPool.getComments(postId);
+		return res.json({ success: true, comments });
+	} catch (err) {
+		console.error('Get comments error:', err);
+		return res.json({ success: false, error: 'Server error.' });
+	}
+});
 
+router.delete('/:id', isAuthenticated, async (req, res) => {
+	const postId = req.params.id;
+	if (!req.session || !('admin' === req.session.role)) {
+		return res.status(403).json({ success: false, error: 'Forbidden' });
+	}
+	if (!postId) {
+		return res.json({ success: false, error: 'Missing post ID.' });
+	}
+	try {
+		await dataPool.deletePost(postId);
+		return res.json({ success: true });
+	} catch (err) {
+		console.error('Delete post error:', err);
+		return res.json({ success: false, error: 'Server error.' });
+	}
+});
 
-
+router.delete('/comment/:commentId', isAuthenticated, async (req, res) => {
+	const commentId = req.params.commentId;
+	if (!req.session || !('admin' === (req.session.role))) {
+		return res.status(403).json({ success: false, error: 'Forbidden' });
+	}
+	if (!commentId) {
+		return res.json({ success: false, error: 'Missing comment ID.' });
+	}
+	try {
+		
+		await dataPool.deleteComment(commentId);
+		return res.json({ success: true });
+	} catch (err) {
+		console.error('Delete comment error:', err);
+		return res.json({ success: false, error: 'Server error.' });
+	}
+});
 module.exports = router;

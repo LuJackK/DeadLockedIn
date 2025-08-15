@@ -11,6 +11,7 @@ import CreatePostPage from './components/community-blog/CreatePostPage';
 import FullPost from './components/community-blog/FullPost';
 import LeaderBoard from './components/players/LeaderBoard';
 import Profile from './components/players/Profile';
+import AccountPage from './components/user/AccountPage';
 const AppRouter = () => (
     <BrowserRouter>
         <Routes>
@@ -19,13 +20,14 @@ const AppRouter = () => (
                 <Route path="heroes" element={<HeroPage />} />
                 <Route path="items" element={<ItemPage />} />
                 <Route path="heroes/:heroId" element={<HeroProfile />} />
-                <Route path="login" element={<Login />}/>
+                <Route path="login" element={<AccountPage />}/>
                 <Route path="create-account" element={<CreateAccount />} />
                 <Route path="blog" element={<BlogPage />} />
                 <Route path="blog/create" element={<CreatePostPage />} />
                 <Route path="post/:id" element={<FullPost />} />
-               <Route path="leaderboard" element={<LeaderBoard />} />
+                <Route path="leaderboard" element={<LeaderBoard />} />
                 <Route path="profile/:id" element={<Profile />} />
+
             </Route>
         </Routes>
     </BrowserRouter>

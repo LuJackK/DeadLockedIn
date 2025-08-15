@@ -50,7 +50,7 @@ const getTabs = () => {
             url: '/blog',
         },
         {
-            text: 'Log in',
+            text: 'Account',
             url: '/login',
         },
     ]

@@ -12,6 +12,7 @@ router.post('/', async (req, res) => {
 		if (user && user.password_hash === password) {
 			req.session.loggedin = true;
 			req.session.username = user.username;
+			req.session.role = user.role;
             console.log(req.session.loggedin);
 			return res.json({ success: true, username: user.username });
 		} else {

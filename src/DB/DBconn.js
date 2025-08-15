@@ -1,3 +1,4 @@
+
 const mysql = require('mysql2');
 require('dotenv').config();
 
@@ -203,6 +204,56 @@ dataPool.getUserVotes = (postId, userId) => {
     });
   });
 }
+dataPool.addComment = (postId, userId, content, createdOn) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'INSERT INTO Comment (post_id, user_id, content, date) VALUES (?, ?, ?, ?)';
+    conn.query(sql, [postId, userId, content, createdOn], (err, result) => {
+      if (err) return reject(err);
+      return resolve(result);
+    });
+  });
+}
+
+// Get all comments for a post
+dataPool.getComments = (postId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM Comment WHERE post_id = ? ORDER BY date DESC';
+    conn.query(sql, [postId], (err, results) => {
+      if (err) return reject(err);
+      return resolve(results);
+    });
+  });
+}
+    
+dataPool.linkSteamAccount = (userId, steamId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE User SET steam_id = ? WHERE username = ?';
+    conn.query(sql, [steamId, userId], (err, result) => {
+      if (err) return reject(err);
+      return resolve(result);
+    });
+  });
+}
+
+dataPool.deletePost = (postId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'DELETE FROM BlogPost WHERE bid = ?';
+    conn.query(sql, [postId], (err, result) => {
+      if (err) return reject(err);
+      return resolve(result);
+    });
+  });
+};
+
+dataPool.deleteComment = (commentId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'DELETE FROM Comment WHERE comment_id = ?';
+    conn.query(sql, [commentId], (err, result) => {
+      if (err) return reject(err);
+      return resolve(result);
+    });
+  });
+};
 
 dataPool.conn = conn;
 module.exports = dataPool;

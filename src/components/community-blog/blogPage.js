@@ -39,6 +39,7 @@ function BlogPage() {
 				<div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
 								{posts.map(post => (
 									<Post
+									    key={post.bid}
 										id={post.bid}
 										title={post.title}
 										content={post.content}
